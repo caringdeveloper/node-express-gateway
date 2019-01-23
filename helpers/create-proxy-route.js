@@ -19,7 +19,14 @@ module.exports = (app, config, route) => {
           (queryString ? '?' + queryString + '&' + route.downstreamUrlSuffix : '?' + route.downstreamUrlSuffix)
       }
 
-      const { data } = await axios[method](URL)
+      let data
+      if (method === 'post' || method === 'put' || method === 'patch') {
+        data = await axios[method](URL, {
+          data: req.body
+        }).data
+      } else {
+        data = await axios[method](URL).data
+      }
 
       if (typeof data === 'string') {
         res.status(200).send(data)

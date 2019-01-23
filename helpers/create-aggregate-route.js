@@ -29,7 +29,15 @@ const handleAggregateRoute = (config, aggregate, method) => async (req, res, nex
       ? 'https://' + route.downstreamHost + ':' + route.downstreamPort
       : 'http://' + route.downstreamHost + ':' + route.downstreamPort
 
-    lazyPromises.push(() => axios[method](URL))
+    lazyPromises.push(() => {
+      if (method === 'post' || method === 'put' || method === 'patch') {
+        return axios[method](URL, {
+          data: req.body
+        })
+      } else {
+        return axios[method](URL)
+      }
+    })
   })
 
   const results = await pAll(lazyPromises, { concurrency: 5 })
