@@ -21,11 +21,24 @@ module.exports = (app, config, route) => {
 
       let data
       if (method === 'post' || method === 'put' || method === 'patch') {
-        data = await axios[method](URL, {
-          data: req.body
-        }).data
+        delete req.headers.host
+
+        const response = await axios[method](URL, {
+          data: req.body,
+          headers: req.headers,
+          params: req.params
+        })
+
+        data = response.data
       } else {
-        data = await axios[method](URL).data
+        delete req.headers.host
+
+        const response = await axios[method](URL, {
+          headers: req.headers,
+          params: req.params
+        })
+
+        data = response.data
       }
 
       if (typeof data === 'string') {

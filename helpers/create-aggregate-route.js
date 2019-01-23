@@ -31,11 +31,20 @@ const handleAggregateRoute = (config, aggregate, method) => async (req, res, nex
 
     lazyPromises.push(() => {
       if (method === 'post' || method === 'put' || method === 'patch') {
+        delete req.headers.host
+
         return axios[method](URL, {
-          data: req.body
+          data: req.body,
+          headers: req.headers,
+          params: req.params
         })
       } else {
-        return axios[method](URL)
+        delete req.headers.host
+
+        return axios[method](URL, {
+          headers: req.headers,
+          params: req.params
+        })
       }
     })
   })
