@@ -1,6 +1,6 @@
 tabWidth: 2
-semi: false
-singleQuote: true
+semi: true
+singleQuote: false
 tabs: false
 printWidth: 120
 bracketSpacing: true
