@@ -4,7 +4,7 @@
     "noImplicitAny": false,
     "removeComments": true,
     "preserveConstEnums": true,
-    "outDir": "./build/",
+    "outDir": "./lib/",
     "sourceMap": true,
     "lib": ["es2017"],
     "target": "es2017"

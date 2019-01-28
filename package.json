@@ -1,10 +1,11 @@
 {
-  "name": "api.gateway",
+  "name": "@coduct/api.gateway",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./lib/main.js",
   "scripts": {
-    "build": "tsc -p ."
+    "build": "tsc -d -p .",
+    "prepublish": "npm run build"
   },
   "keywords": [],
   "author": "",

@@ -31,17 +31,19 @@ const readConfiguration = (configurationFilePath: string): Configuration => {
 /**
  * Application kickoff
  */
-try {
-  const config = readConfiguration("./config.yaml");
+export const run = (configFilePath: string) => {
+  try {
+    const config = readConfiguration(configFilePath);
 
-  // Installing global middleware
-  app.use(cors());
+    // Installing global middleware
+    app.use(cors());
 
-  // Building the reverse proxy facade
-  if (config.routes) config.routes.forEach(route => createProxyRoute(app, config, route));
-  if (config.aggregates) config.aggregates.forEach(aggregate => createAggregateRoute(app, config, aggregate));
+    // Building the reverse proxy facade
+    if (config.routes) config.routes.forEach(route => createProxyRoute(app, config, route));
+    if (config.aggregates) config.aggregates.forEach(aggregate => createAggregateRoute(app, config, aggregate));
 
-  app.listen(config.port, () => console.log("[INFO]", "Gateway is listening"));
-} catch (err) {
-  console.log("[ERROR]", err);
-}
+    app.listen(config.port, () => console.log("[INFO]", "Gateway is listening"));
+  } catch (err) {
+    console.log("[ERROR]", err);
+  }
+};
