@@ -17,6 +17,7 @@
     "express": "^4.16.4",
     "jsonwebtoken": "^8.4.0",
     "p-all": "^1.0.0",
+    "path-to-regexp": "^3.0.0",
     "yaml": "^1.2.1"
   },
   "devDependencies": {
