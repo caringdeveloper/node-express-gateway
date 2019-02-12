@@ -9,11 +9,15 @@
 import * as axios from "axios";
 import * as express from "express";
 import { Configuration, Route } from "../models/Configuration";
+import * as pathToRegexp from "path-to-regexp";
 
 const authentication = require("../middleware/authentication");
 const authorization = require("../middleware/authorization");
 
 export default (app: express.Application, config: Configuration, route: Route): void => {
+  // Factory for a path function that can be used inside the routeProxy
+  const toPath = pathToRegexp.compile(route.downstreamPath);
+
   let URL = route.downstreamSSL
     ? "https://" + route.downstreamHost + ":" + route.downstreamPort
     : "http://" + route.downstreamHost + ":" + route.downstreamPort;
@@ -24,6 +28,8 @@ export default (app: express.Application, config: Configuration, route: Route): 
     next: express.NextFunction
   ) => {
     try {
+      URL += toPath(req.params);
+
       if (route.downstreamUrlSuffix) {
         const parts = req.url.split("?");
         let queryString = parts[1];
@@ -33,6 +39,8 @@ export default (app: express.Application, config: Configuration, route: Route): 
           (queryString ? "?" + queryString + "&" + route.downstreamUrlSuffix : "?" + route.downstreamUrlSuffix);
       }
 
+      console.log("[DEBUG]", "URL", URL);
+
       let data;
       if (method === "post" || method === "put" || method === "patch") {
         delete req.headers.host;
@@ -40,7 +48,7 @@ export default (app: express.Application, config: Configuration, route: Route): 
         const response = await axios.default[method](URL, {
           data: req.body,
           headers: req.headers,
-          params: req.params
+          params: req.query
         });
 
         data = response.data;
@@ -49,7 +57,7 @@ export default (app: express.Application, config: Configuration, route: Route): 
 
         const response = await axios.default[method](URL, {
           headers: req.headers,
-          params: req.params
+          params: req.query
         });
 
         data = response.data;
@@ -61,8 +69,7 @@ export default (app: express.Application, config: Configuration, route: Route): 
         return res.status(200).json(data);
       }
     } catch (err) {
-      console.log("[ERROR]", err);
-      return res.status(500).send();
+      return res.status(err.response.status).send(err.response.data);
     }
   };
 
