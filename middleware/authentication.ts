@@ -6,14 +6,15 @@
  * Written by Erek Röös <erek.roeoes@coduct.com>, 2019
  */
 
+import axios from "axios";
 import * as jwt from "jsonwebtoken";
-import * as axios from "axios";
 import * as express from "express";
 import { Configuration } from "../models/Configuration";
+import * as pathToRegexp from "path-to-regexp";
 
 const { JWT_SECRET } = process.env;
 
-export default (config: Configuration) => async (
+export const authentication = (config: Configuration) => async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -22,7 +23,8 @@ export default (config: Configuration) => async (
 
   // For now the authentication middleware will only support Bearer JWT Token authentication
   const authenticationString = req.headers.authorization;
-  if (!authenticationString) return res.status(400).json({ reason: "No authentication header found" });
+  if (!authenticationString)
+    return res.status(400).json({ reason: "No authentication header found" });
 
   const token = authenticationString.split(" ")[1];
 
@@ -38,26 +40,28 @@ export default (config: Configuration) => async (
 
   console.log("[DEBUG]", "Decoded token", decodedToken);
 
+  // Check if token is still valid
   try {
-    const { data } = await axios.default.get(
-      "https://" +
-        config.authentication.host +
-        ":" +
-        config.authentication.port +
-        "/" +
-        config.authentication.path +
-        "/" +
-        token
+    const toPath = pathToRegexp.compile(config.authentication.path);
+    const compiledPath = toPath({
+      userId: decodedToken.id,
+      token
+    });
+
+    console.log("[DEBUG]", "Compiled path", compiledPath);
+
+    await axios.get(
+      `http://${config.authentication.host}:${config.authentication.port}${compiledPath}`
     );
 
     req["user"] = {
-      id: data.userId,
-      scopes: decodedToken.scopes
+      id: decodedToken.id,
+      scopes: decodedToken.scope
     };
 
     return next();
   } catch (err) {
-    console.log("[DEBUG]", "Token seems not be valid");
-    return res.status(400).json({ reason: "Token seems not be valid" });
+    console.log("[DEBUG]", "Token seems not to be valid");
+    return res.status(400).json({ reason: "Token seems not to be valid" });
   }
 };

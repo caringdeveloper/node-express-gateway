@@ -12,6 +12,7 @@ import * as fs from "fs";
 import * as express from "express";
 import * as yaml from "yaml";
 import * as cors from "cors";
+import * as bodyParser from "body-parser";
 import { Configuration } from "./models/Configuration";
 
 import createProxyRoute from "./helpers/create-proxy-route";
@@ -37,10 +38,12 @@ export const run = (configFilePath: string) => {
 
     // Installing global middleware
     app.use(cors());
+    app.use(bodyParser.json({ limit: "50MB" }));
 
     // Building the reverse proxy facade
     if (config.routes) config.routes.forEach(route => createProxyRoute(app, config, route));
-    if (config.aggregates) config.aggregates.forEach(aggregate => createAggregateRoute(app, config, aggregate));
+    if (config.aggregates)
+      config.aggregates.forEach(aggregate => createAggregateRoute(app, config, aggregate));
 
     app.listen(config.port, () => console.log("[INFO]", "Gateway is listening"));
   } catch (err) {

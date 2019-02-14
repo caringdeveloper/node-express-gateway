@@ -7,28 +7,29 @@
  */
 
 import * as axios from "axios";
-import * as express from "express";
-import { Configuration, Route } from "../models/Configuration";
+import { Request, Response, NextFunction, Application } from "express";
 import * as pathToRegexp from "path-to-regexp";
 
-const authentication = require("../middleware/authentication");
-const authorization = require("../middleware/authorization");
+import { Configuration, Route } from "../models/Configuration";
+import { authentication } from "../middleware/authentication";
+import { authorization } from "../middleware/authorization";
 
-export default (app: express.Application, config: Configuration, route: Route): void => {
+export default (app: Application, config: Configuration, route: Route): void => {
   // Factory for a path function that can be used inside the routeProxy
   const toPath = pathToRegexp.compile(route.downstreamPath);
 
-  let URL = route.downstreamSSL
-    ? "https://" + route.downstreamHost + ":" + route.downstreamPort
-    : "http://" + route.downstreamHost + ":" + route.downstreamPort;
-
   const routeProxy = (method: string) => async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
+    req: Request,
+    res: Response,
+    next: NextFunction
   ) => {
     try {
+      let URL = route.downstreamSSL
+        ? "https://" + route.downstreamHost + ":" + route.downstreamPort
+        : "http://" + route.downstreamHost + ":" + route.downstreamPort;
+
       URL += toPath(req.params);
+      URL += req.url.split("?")[1] !== undefined ? "?" + req.url.split("?")[1] : "";
 
       if (route.downstreamUrlSuffix) {
         const parts = req.url.split("?");
@@ -36,7 +37,9 @@ export default (app: express.Application, config: Configuration, route: Route): 
 
         URL +=
           parts[0] +
-          (queryString ? "?" + queryString + "&" + route.downstreamUrlSuffix : "?" + route.downstreamUrlSuffix);
+          (queryString
+            ? "?" + queryString + "&" + route.downstreamUrlSuffix
+            : "?" + route.downstreamUrlSuffix);
       }
 
       console.log("[DEBUG]", "URL", URL);
@@ -45,9 +48,12 @@ export default (app: express.Application, config: Configuration, route: Route): 
       if (method === "post" || method === "put" || method === "patch") {
         delete req.headers.host;
 
-        const response = await axios.default[method](URL, {
-          data: req.body,
-          headers: req.headers,
+        const response = await axios.default[method](URL, req.body, {
+          headers: {
+            ...req.headers,
+            "x-user-info": JSON.stringify(req["user"] || null),
+            "Cache-Control": "no-cache"
+          },
           params: req.query
         });
 
@@ -56,7 +62,11 @@ export default (app: express.Application, config: Configuration, route: Route): 
         delete req.headers.host;
 
         const response = await axios.default[method](URL, {
-          headers: req.headers,
+          headers: {
+            ...req.headers,
+            "x-user-info": JSON.stringify(req["user"] || null),
+            "Cache-Control": "no-cache"
+          },
           params: req.query
         });
 
@@ -69,7 +79,9 @@ export default (app: express.Application, config: Configuration, route: Route): 
         return res.status(200).json(data);
       }
     } catch (err) {
-      return res.status(err.response.status).send(err.response.data);
+      console.log("[ERROR]", err);
+      // return res.status(err.response.status).send(err.response.data);
+      return res.status(500).send();
     }
   };
 
@@ -79,7 +91,12 @@ export default (app: express.Application, config: Configuration, route: Route): 
     });
   } else {
     route.upstreamMethods.forEach(method => {
-      app[method](route.upstreamPath, authentication(config), authorization(route.scopes), routeProxy(method));
+      app[method](
+        route.upstreamPath,
+        authentication(config),
+        authorization(route.scopes),
+        routeProxy(method)
+      );
     });
   }
 };
