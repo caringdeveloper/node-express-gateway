@@ -80,7 +80,10 @@ export default (app: Application, config: Configuration, route: Route): void => 
       }
     } catch (err) {
       console.log("[ERROR]", err);
-      // return res.status(err.response.status).send(err.response.data);
+      if (err.response && err.response.status) {
+        return res.status(err.response.status).send(err.response.data);
+      }
+
       return res.status(500).send();
     }
   };
