@@ -79,7 +79,17 @@ export default (app: Application, config: Configuration, route: Route): void => 
         return res.status(200).json(data);
       }
     } catch (err) {
-      console.log("[ERROR]", err);
+			const filteredError = {
+        Address: `${err.address}:${err.port}`,
+        ToUrl: err.config.url,
+        StatusCode: err.response && err.response.status,
+        Headers: err.config.headers.authorization,
+        Method: err.config.method,
+        Params: err.config.params,
+        Body: err.response && err.response.body,
+        Data: err.response && err.response.data
+      };
+			console.log("[ERROR - CREATE-PROXY-ROUTE]", filteredError);
       if (err.response && err.response.status) {
         return res.status(err.response.status).send(err.response.data);
       }
