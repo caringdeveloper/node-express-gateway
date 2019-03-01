@@ -12,7 +12,7 @@ import * as express from "express";
 import { Configuration } from "../models/Configuration";
 import * as pathToRegexp from "path-to-regexp";
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET_KEY } = process.env;
 
 export const authentication = (config: Configuration) => async (
   req: express.Request,
@@ -30,7 +30,7 @@ export const authentication = (config: Configuration) => async (
 
   let decodedToken;
   try {
-    decodedToken = jwt.verify(token, JWT_SECRET);
+    decodedToken = jwt.verify(token, JWT_SECRET_KEY);
   } catch (err) {
     return res.status(400).json({ reason: "Token is malformed" });
   }

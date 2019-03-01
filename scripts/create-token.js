@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET_KEY } = process.env;
 
 const signedJWT = jwt.sign(
   {
@@ -9,7 +9,7 @@ const signedJWT = jwt.sign(
     name: "Application Identity",
     scope: "app"
   },
-  JWT_SECRET
+  JWT_SECRET_KEY
 );
 
 console.log(signedJWT);
