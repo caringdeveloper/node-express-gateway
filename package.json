@@ -1,6 +1,6 @@
 {
   "name": "@coduct/api.gateway",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Small API gateway that can be configured with one single yaml file",
   "main": "./lib/main.js",
   "scripts": {
@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
+    "express-rate-limit": "^3.4.0",
     "jsonwebtoken": "^8.4.0",
     "p-all": "^1.0.0",
     "path-to-regexp": "^3.0.0",
@@ -28,6 +29,7 @@
     "@types/body-parser": "^1.17.0",
     "@types/cors": "^2.8.4",
     "@types/express": "^4.16.1",
+    "@types/express-rate-limit": "^3.3.0",
     "@types/jsonwebtoken": "^8.3.0",
     "@types/node": "^10.12.18",
     "@types/p-all": "^1.0.0",
