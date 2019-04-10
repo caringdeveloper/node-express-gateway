@@ -113,7 +113,7 @@ export default (app: Application, config: Configuration, route: Route): void => 
       max: route.maxRetry,
       message: "Slow down, BOI!",
       onLimitReached: (req, res, options) => {
-        console.log("Ratelimit hit on", route.upstreamMethods);
+        console.log("Ratelimit hit on", route.upstreamPath);
       }
     });
 
