@@ -110,7 +110,11 @@ export default (app: Application, config: Configuration, route: Route): void => 
     // Create our ratelimiter with given configuration
     const limiter = new rateLimit({
       windowMs: route.findTime * 60 * 1000,
-      max: route.maxRetry
+      max: route.maxRetry,
+      message: "Slow down, BOI!",
+      onLimitReached: (req, res, options) => {
+        console.log("Ratelimit hit on", route.upstreamMethods);
+      }
     });
 
     middlewares.push(limiter);
