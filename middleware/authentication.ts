@@ -40,6 +40,17 @@ export const authentication = (config: Configuration) => async (
 
   console.log("[DEBUG]", "Decoded token", decodedToken);
 
+  // Check if app override
+  if (decodedToken.scope === "app") {
+    req["user"] = {
+      id: decodedToken.id,
+      scopes: decodedToken.scope,
+      token
+    };
+
+    return next();
+  }
+
   // Check if token is still valid
   try {
     const toPath = pathToRegexp.compile(config.authentication.path);
@@ -56,7 +67,8 @@ export const authentication = (config: Configuration) => async (
 
     req["user"] = {
       id: decodedToken.id,
-      scopes: decodedToken.scope
+      scopes: decodedToken.scope,
+      token
     };
 
     return next();
