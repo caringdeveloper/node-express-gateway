@@ -36,6 +36,9 @@ export const run = (configFilePath: string) => {
   try {
     const config = readConfiguration(configFilePath);
 
+    // Trust our nginx reverse proxy
+    app.enable("trust proxy");
+
     // Installing global middleware
     app.use(cors());
     app.use(bodyParser.json({ limit: "50MB" }));

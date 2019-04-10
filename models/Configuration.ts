@@ -30,6 +30,9 @@ export type Route = {
   key: string;
   scopes: string[];
   auth: boolean;
+  ratelimit: boolean;
+  findTime: number;
+  maxRetry: number;
 };
 
 export type Aggregate = {

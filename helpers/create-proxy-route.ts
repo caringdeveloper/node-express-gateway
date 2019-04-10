@@ -9,6 +9,7 @@
 import * as axios from "axios";
 import { Request, Response, NextFunction, Application } from "express";
 import * as pathToRegexp from "path-to-regexp";
+import * as rateLimit from "express-rate-limit";
 
 import { Configuration, Route } from "../models/Configuration";
 import { authentication } from "../middleware/authentication";
@@ -79,7 +80,7 @@ export default (app: Application, config: Configuration, route: Route): void => 
         return res.status(200).json(data);
       }
     } catch (err) {
-			const filteredError = {
+      const filteredError = {
         Address: `${err.address}:${err.port}`,
         ToUrl: err.config.url,
         StatusCode: err.response && err.response.status,
@@ -89,7 +90,7 @@ export default (app: Application, config: Configuration, route: Route): void => 
         Body: err.response && err.response.body,
         Data: err.response && err.response.data
       };
-			console.log("[ERROR - CREATE-PROXY-ROUTE]", filteredError);
+      console.log("[ERROR - CREATE-PROXY-ROUTE]", filteredError);
       if (err.response && err.response.status) {
         return res.status(err.response.status).send(err.response.data);
       }
@@ -98,18 +99,24 @@ export default (app: Application, config: Configuration, route: Route): void => 
     }
   };
 
-  if (!route.auth) {
-    route.upstreamMethods.forEach(method => {
-      app[method](route.upstreamPath, routeProxy(method));
-    });
-  } else {
-    route.upstreamMethods.forEach(method => {
-      app[method](
-        route.upstreamPath,
-        authentication(config),
-        authorization(route.scopes),
-        routeProxy(method)
-      );
-    });
+  // apply middlewares
+  let middlewares: Function[] = [];
+
+  if (route.auth) {
+    middlewares.push(authentication(config));
+    middlewares.push(authorization(route.scopes));
   }
+  if (route.ratelimit) {
+    // Create our ratelimiter with given configuration
+    const limiter = new rateLimit({
+      windowMs: route.findTime * 60 * 1000,
+      max: route.maxRetry
+    });
+
+    middlewares.push(limiter);
+  }
+
+  route.upstreamMethods.forEach(method => {
+    app[method](route.upstreamPath, middlewares, routeProxy(method));
+  });
 };
