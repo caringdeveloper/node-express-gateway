@@ -1,6 +1,6 @@
 {
   "name": "@coduct/api.gateway",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Small API gateway that can be configured with one single yaml file",
   "main": "./lib/main.js",
   "scripts": {
