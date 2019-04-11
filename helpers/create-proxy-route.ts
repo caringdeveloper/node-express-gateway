@@ -11,7 +11,7 @@ import { Request, Response, NextFunction, Application } from "express";
 import * as pathToRegexp from "path-to-regexp";
 import * as rateLimit from "express-rate-limit";
 
-import { Configuration, Route } from "../models/Configuration";
+import { Configuration, Route, GatewayRequest } from "../models/Configuration";
 import { authentication } from "../middleware/authentication";
 import { authorization } from "../middleware/authorization";
 
@@ -112,10 +112,10 @@ export default (app: Application, config: Configuration, route: Route): void => 
       windowMs: route.findTime * 60 * 1000,
       max: route.maxRetry,
       message: "Slow down, BOI!",
-      keyGenerator: (req, res) => {
+      keyGenerator: (req: GatewayRequest) => {
         return req.user.id;
       },
-      onLimitReached: (req, res, options) => {
+      onLimitReached: (req: GatewayRequest) => {
         console.log("Ratelimit hit on", route.upstreamPath, "for user", req.user.id);
       }
     });
