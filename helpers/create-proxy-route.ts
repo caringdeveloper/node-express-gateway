@@ -112,8 +112,11 @@ export default (app: Application, config: Configuration, route: Route): void => 
       windowMs: route.findTime * 60 * 1000,
       max: route.maxRetry,
       message: "Slow down, BOI!",
+      keyGenerator: (req, res) => {
+        return req.user.id;
+      },
       onLimitReached: (req, res, options) => {
-        console.log("Ratelimit hit on", route.upstreamPath);
+        console.log("Ratelimit hit on", route.upstreamPath, "for user", req.user.id);
       }
     });
 
