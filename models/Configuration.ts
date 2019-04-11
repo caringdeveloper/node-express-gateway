@@ -5,6 +5,7 @@
  * Proprietary and confidential
  * Written by Erek Röös <erek.roeoes@coduct.com>, 2019
  */
+import { Request } from "express";
 
 export type Configuration = {
   port: number;
@@ -41,3 +42,7 @@ export type Aggregate = {
   upstreamMethods: string[];
   auth: boolean;
 };
+
+export interface GatewayRequest extends Request {
+  user: any;
+}
