@@ -50,6 +50,6 @@ export const run = (configFilePath: string) => {
 
     app.listen(config.port, () => console.log("[INFO]", "Gateway is listening"));
   } catch (err) {
-    console.log("[ERROR]", err);
+    console.log("[ERROR] ", new Date().toISOString(), " :: ", err);
   }
 };
