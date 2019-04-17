@@ -43,7 +43,7 @@ export default (app: Application, config: Configuration, route: Route): void => 
             : "?" + route.downstreamUrlSuffix);
       }
 
-      console.log("[DEBUG]", "URL", URL);
+      console.log("[DEBUG]", new Date().toISOString(), " :: ", "URL", URL);
 
       let data;
       if (method === "post" || method === "put" || method === "patch") {
