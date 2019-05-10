@@ -73,7 +73,14 @@ export const authentication = (config: Configuration) => async (
 
     return next();
   } catch (err) {
-    console.log("[DEBUG]", "Token seems not to be valid");
-    return res.status(400).json({ reason: "Token seems not to be valid" });
+    if (err.response && err.response.status) {
+      if (err.response.status === 403) {
+        console.log("[DEBUG]", "User is banned");
+        return res.status(403).json({ reason: "The account is banned" });
+      }
+    } else {
+      console.log("[DEBUG]", "Token seems not to be valid");
+      return res.status(400).json({ reason: "Token seems not to be valid" });
+    }
   }
 };
