@@ -54,7 +54,7 @@ export default (app: Application, config: Configuration, route: Route): void => 
 
         URL +=
           (queryString
-            ? "?" + queryString + "&" + route.downstreamUrlSuffix
+            ? "&" + route.downstreamUrlSuffix
             : "?" + route.downstreamUrlSuffix);
       }
 
