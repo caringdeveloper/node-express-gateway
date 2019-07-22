@@ -1,6 +1,6 @@
 {
   "name": "node-express-gateway",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Small and simple API gateway that can be configured with one single yaml file",
   "main": "./lib/main.js",
   "scripts": {
@@ -10,7 +10,12 @@
   "files": [
     "lib"
   ],
-  "keywords": ["API", "Gateway", "express", "node"],
+  "keywords": [
+    "API",
+    "Gateway",
+    "express",
+    "node"
+  ],
   "author": "Erek Röös <erek.roeoes@outlook.de>",
   "license": "MIT",
   "homepage": "https://github.com/caringdeveloper/node-express-gateway#readme",
