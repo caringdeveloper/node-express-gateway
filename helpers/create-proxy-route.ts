@@ -53,7 +53,6 @@ export default (app: Application, config: Configuration, route: Route): void => 
         let queryString = parts[1];
 
         URL +=
-          parts[0] +
           (queryString
             ? "?" + queryString + "&" + route.downstreamUrlSuffix
             : "?" + route.downstreamUrlSuffix);
