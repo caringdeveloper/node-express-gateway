@@ -25,7 +25,7 @@
 import * as axios from "axios";
 import { Request, Response, NextFunction, Application } from "express";
 import * as pathToRegexp from "path-to-regexp";
-import * as RateLimit from "express-rate-limit";
+import RateLimiter from "express-rate-limit";
 
 import { Configuration, Route, GatewayRequest } from "../models/Configuration";
 import { authentication } from "../middleware/authentication";
@@ -122,9 +122,10 @@ export default (app: Application, config: Configuration, route: Route): void => 
     middlewares.push(authentication(config));
     middlewares.push(authorization(route.scopes));
   }
+  
   if (route.ratelimit) {
     // Create our ratelimiter with given configuration
-    const limiter = new RateLimit({
+    const limiter = RateLimiter({
       windowMs: route.findTime * 60 * 1000,
       max: route.maxRetry,
       message: "Slow down, BOI!",
