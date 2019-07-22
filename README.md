@@ -26,9 +26,9 @@
 ### Installation
 
 ```bash
-$ npm i node-express-gateway
+$ npm i node-api-gateway
 $ # or
-$ yarn add node-express-gateway
+$ yarn add node-api-gateway
 ```
 
 ### Usage

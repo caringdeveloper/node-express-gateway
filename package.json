@@ -1,5 +1,5 @@
 {
-  "name": "@caringdeveloper/node-api-gateway",
+  "name": "node-api-gateway",
   "version": "0.2.0",
   "description": "Small and simple API gateway that can be configured with one single yaml file",
   "main": "./lib/main.js",
