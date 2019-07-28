@@ -23,35 +23,13 @@
 */
 
 import * as express from "express";
-import { Container } from "inversify";
-import ConfigurationProvider from "./ConfigurationProvider";
-import IConfigurationProvider from "./IConfigurationProvider";
-import { Application } from "express";
-import Library from "../Library";
-import IRouteGenerator from "./IRouteGenerator";
-import RouteGenerator from "./RouteGenerator";
-import IAuthenticator from "./middleware/IAuthenticator";
-import JwtAuthenticator from "./middleware/JwtAuthenticator";
-import IAuthorizer from "./middleware/IAuthorizer";
-import ScopeAuthorizer from "./middleware/ScopeAuthorizer";
 
-const diContainer = new Container();
-const app = express();
+export type AuthorizationMiddleware = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => express.Response | void;
 
-diContainer
-  .bind<Library>("Library")
-  .to(Library)
-  .inSingletonScope();
-
-diContainer
-  .bind<IConfigurationProvider>("ConfigurationProvider")
-  .to(ConfigurationProvider)
-  .inSingletonScope();
-
-diContainer.bind<IAuthenticator>("Authenticator").to(JwtAuthenticator);
-diContainer.bind<IAuthorizer>("Authorizer").to(ScopeAuthorizer);
-diContainer.bind<IRouteGenerator>("RouteGenerator").to(RouteGenerator);
-
-diContainer.bind<Application>("App").toConstantValue(app);
-
-export default diContainer;
+export default interface IAuthorizer {
+  authorize(scopes: string[]): AuthorizationMiddleware;
+}

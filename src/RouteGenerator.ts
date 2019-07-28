@@ -30,8 +30,8 @@ import { Application, Request, Response, NextFunction } from "express";
 import IRouteGenerator from "./IRouteGenerator";
 import IConfigurationProvider from "./IConfigurationProvider";
 import { Route, Configuration, GatewayRequest } from "./models/Configuration";
-import { authentication } from "./middleware/authentication";
-import { authorization } from "./middleware/authorization";
+import IAuthenticator from "./middleware/IAuthenticator";
+import IAuthorizer from "./middleware/IAuthorizer";
 
 @injectable()
 export default class RouteGenerator implements IRouteGenerator {
@@ -40,6 +40,12 @@ export default class RouteGenerator implements IRouteGenerator {
 
   @inject("ConfigurationProvider")
   private configurationProvider: IConfigurationProvider;
+
+  @inject("Authenticator")
+  private authenticator: IAuthenticator;
+
+  @inject("Authorizer")
+  private authorizer: IAuthorizer;
 
   private configuration: Configuration = undefined;
 
@@ -126,8 +132,8 @@ export default class RouteGenerator implements IRouteGenerator {
     let middlewares: Function[] = [];
 
     if (route.auth) {
-      middlewares.push(authentication(this.configuration));
-      middlewares.push(authorization(route.scopes));
+      middlewares.push(this.authenticator.authenticate);
+      middlewares.push(this.authorizer.authorize(route.scopes));
     }
 
     route.upstreamMethods.forEach(method => {

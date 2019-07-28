@@ -24,18 +24,10 @@
 
 import * as express from "express";
 
-export const authorization = (scopes: string[]) => (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
-  console.log("[MIDDLEWARE]", "Authorizing the user");
-
-  console.log("[DEBUG]", new Date().toISOString(), " :: ", "Given scopes", scopes);
-  console.log("[DEBUG]", new Date().toISOString(), " :: ", "Authenticated user", req["user"]);
-
-  if (!scopes.includes(req["user"].scopes))
-    return res.status(401).json({ reason: "Not authorized" });
-
-  return next();
-};
+export default interface IAuthenticator {
+  authenticate(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ): Promise<express.Response | void>;
+}
