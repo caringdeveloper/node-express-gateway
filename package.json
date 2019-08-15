@@ -1,6 +1,6 @@
 {
   "name": "node-express-gateway",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Small and simple API gateway that can be configured with one single yaml file",
   "main": "./lib/index.js",
   "scripts": {
