@@ -48,7 +48,7 @@ export type Route = {
   key: string;
   scopes: string[];
   auth: boolean;
-  ratelimit: boolean;
+  rateLimit: boolean;
   findTime: number;
   maxRetry: number;
 };
