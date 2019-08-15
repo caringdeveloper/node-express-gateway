@@ -22,13 +22,10 @@
     THE SOFTWARE.
 */
 
-// import index from "../index";
+import Gateway from "../index";
 
-// describe("Just let the application run", () => {
-//   it("should just run the application", () => {
-//     index.run("./__tests__/fixtures/config.yml");
-//   });
-// });
+const gw1 = Gateway();
+const gw2 = Gateway();
 
-const index = require("../lib/index").default;
-index.run("./__tests__/fixtures/config.yml");
+gw1.run("./__tests__/fixtures/config.yml");
+gw2.run("./__tests__/fixtures/config_2.yml");

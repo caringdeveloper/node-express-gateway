@@ -22,11 +22,12 @@
     THE SOFTWARE.
 */
 
-import { Application } from "express";
-import { Route } from "./models/Configuration";
+import * as express from "express";
 
-export default interface IRouteGenerator {
-  injectAppInstance(app: Application)
-  createProxyRoute(route: Route): void;
-  createAggregateRoute(route: Route): void;
+export default interface IUserInformation {
+  buildUser(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ): Promise<void>;
 }

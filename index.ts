@@ -29,5 +29,7 @@ import diContainer from "./src/DiContainer";
 import Library from "./Library";
 
 dotenv.config();
-const lib = diContainer.get<Library>("Library");
-export default lib;
+
+export default function(): Library {
+  return diContainer.get<Library>("Library");
+}

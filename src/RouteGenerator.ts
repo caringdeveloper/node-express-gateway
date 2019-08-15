@@ -32,12 +32,10 @@ import IConfigurationProvider from "./IConfigurationProvider";
 import { Route, Configuration, GatewayRequest } from "./models/Configuration";
 import IAuthenticator from "./middleware/IAuthenticator";
 import IAuthorizer from "./middleware/IAuthorizer";
+import IUserInformation from "./middleware/IUserInformation";
 
 @injectable()
 export default class RouteGenerator implements IRouteGenerator {
-  @inject("App")
-  private app: Application;
-
   @inject("ConfigurationProvider")
   private configurationProvider: IConfigurationProvider;
 
@@ -47,7 +45,15 @@ export default class RouteGenerator implements IRouteGenerator {
   @inject("Authorizer")
   private authorizer: IAuthorizer;
 
+  @inject("UserInformation")
+  private userInformation: IUserInformation;
+
   private configuration: Configuration = undefined;
+  private app: Application = undefined;
+
+  public injectAppInstance(app: Application) {
+    this.app = app;
+  }
 
   public async createProxyRoute(route: Route): Promise<void> {
     if (!this.configuration)
@@ -129,15 +135,17 @@ export default class RouteGenerator implements IRouteGenerator {
       }
     };
 
-    let middlewares: Function[] = [];
+    let middleware: Function[] = [];
 
     if (route.auth) {
-      middlewares.push(this.authenticator.authenticate);
-      middlewares.push(this.authorizer.authorize(route.scopes));
+      middleware.push(this.authenticator.authenticate);
+      middleware.push(this.authorizer.authorize(route.scopes));
+    } else {
+      middleware.push(this.userInformation.buildUser);
     }
 
     route.upstreamMethods.forEach(method => {
-      this.app[method](route.upstreamPath, middlewares, routeProxy(method));
+      this.app[method](route.upstreamPath, middleware, routeProxy(method));
     });
   }
 

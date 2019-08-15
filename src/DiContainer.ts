@@ -23,7 +23,7 @@
 */
 
 import * as express from "express";
-import { Container } from "inversify";
+import { Container, interfaces } from "inversify";
 import ConfigurationProvider from "./ConfigurationProvider";
 import IConfigurationProvider from "./IConfigurationProvider";
 import { Application } from "express";
@@ -34,14 +34,16 @@ import IAuthenticator from "./middleware/IAuthenticator";
 import JwtAuthenticator from "./middleware/JwtAuthenticator";
 import IAuthorizer from "./middleware/IAuthorizer";
 import ScopeAuthorizer from "./middleware/ScopeAuthorizer";
+import IUserInformation from "./middleware/IUserInformation";
+import UserInformation from "./middleware/UserInformation";
 
 const diContainer = new Container();
-const app = express();
+// const app = express();
 
 diContainer
   .bind<Library>("Library")
   .to(Library)
-  .inSingletonScope();
+  // .inSingletonScope();
 
 diContainer
   .bind<IConfigurationProvider>("ConfigurationProvider")
@@ -51,7 +53,9 @@ diContainer
 diContainer.bind<IAuthenticator>("Authenticator").to(JwtAuthenticator);
 diContainer.bind<IAuthorizer>("Authorizer").to(ScopeAuthorizer);
 diContainer.bind<IRouteGenerator>("RouteGenerator").to(RouteGenerator);
+diContainer.bind<IUserInformation>("UserInformation").to(UserInformation);
 
-diContainer.bind<Application>("App").toConstantValue(app);
+// diContainer.bind<Application>("App").toConstantValue(app);
+diContainer.bind<Application>("App").toDynamicValue((ctx: interfaces.Context) => express())
 
 export default diContainer;

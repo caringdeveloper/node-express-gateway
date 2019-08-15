@@ -49,6 +49,7 @@ export default class Library {
     this.app.use(cors());
     this.app.use(bodyParser.json({ limit: "50MB" }));
 
+    this.routeGenerator.injectAppInstance(this.app);
     if (config.routes) {
       config.routes.forEach(route => this.routeGenerator.createProxyRoute(route));
     }
