@@ -40,7 +40,8 @@ export type Authentication = {
 export enum AuthType {
   UNDEFINED = 0,
   AUTH0 = 1,
-  PLAIN_JWT = 2,
+  SELF_IMPLEMENTED = 2,
+  API_KEY = 3,
 }
 
 export type Route = {

@@ -150,7 +150,7 @@ export default class RouteGenerator implements IRouteGenerator {
           authenticator = diContainer.get<IAuthenticator>('Auth0Authenticator')
           break
 
-        case AuthType.PLAIN_JWT:
+        case AuthType.SELF_IMPLEMENTED:
           authenticator = diContainer.get<IAuthenticator>('Authenticator')
           break
       }
