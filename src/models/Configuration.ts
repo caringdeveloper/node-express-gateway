@@ -22,44 +22,50 @@
     THE SOFTWARE.
 */
 
-import { Request } from "express";
+import { Request } from 'express'
 
 export type Configuration = {
-  port: number;
-  authentication: Authentication;
-  routes: Route[];
-  aggregates: Aggregate[];
-};
+  port: number
+  authentication: Authentication
+  routes: Route[]
+  aggregates: Aggregate[]
+}
 
 export type Authentication = {
-  host: string;
-  port: number;
-  path: string;
-};
+  host: string
+  port: number
+  path: string
+}
+
+export enum AuthType {
+  UNDEFINED = 0,
+  AUTH0 = 1,
+  PLAIN_JWT = 2,
+}
 
 export type Route = {
-  downstreamPath: string;
-  downstreamHost: string;
-  downstreamPort: number;
-  downstreamSSL: boolean;
-  downstreamUrlSuffix: string;
-  upstreamPath: string;
-  upstreamMethods: string[];
-  key: string;
-  scopes: string[];
-  auth: boolean;
-  rateLimit: boolean;
-  findTime: number;
-  maxRetry: number;
-};
+  downstreamPath: string
+  downstreamHost: string
+  downstreamPort: number
+  downstreamSSL: boolean
+  downstreamUrlSuffix: string
+  upstreamPath: string
+  upstreamMethods: string[]
+  key: string
+  scopes: string[]
+  auth: AuthType
+  rateLimit: boolean
+  findTime: number
+  maxRetry: number
+}
 
 export type Aggregate = {
-  upstreamPath: string;
-  keys: string[];
-  upstreamMethods: string[];
-  auth: boolean;
-};
+  upstreamPath: string
+  keys: string[]
+  upstreamMethods: string[]
+  auth: boolean
+}
 
 export interface GatewayRequest extends Request {
-  user: any;
+  user: any
 }

@@ -22,12 +22,12 @@
     THE SOFTWARE.
 */
 
-import * as axios from "axios";
-import * as pAll from "p-all";
-import * as express from "express";
-import { Configuration, Aggregate } from "../models/Configuration";
+import axios, { AxiosResponse } from 'axios'
+import pAll from 'p-all'
+import express from 'express'
+import { Configuration, Aggregate } from '../models/Configuration'
 
-type AxiosPromise = () => Promise<axios.AxiosResponse>;
+type AxiosPromise = () => Promise<AxiosResponse>
 
 /**
  * Aggregate route which builds a facade for the client so that it can call
@@ -43,55 +43,55 @@ const handleAggregateRoute = (
   method: string
 ) => async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   // Collecting routes that this aggregate consists of
-  const { keys } = aggregate;
-  const lazyPromises: AxiosPromise[] = [];
-  let resolvedPromisesResults: any = {};
+  const { keys } = aggregate
+  const lazyPromises: AxiosPromise[] = []
+  let resolvedPromisesResults: any = {}
 
-  keys.forEach(key => {
+  keys.forEach((key) => {
     // Create own HTTP requests and set the correct body according to the key of the route
-    resolvedPromisesResults[key] = undefined;
+    resolvedPromisesResults[key] = undefined
 
-    const route = config.routes.find(e => e.key === key);
+    const route = config.routes.find((e) => e.key === key)
     const URL = route.downstreamSSL
-      ? "https://" + route.downstreamHost + ":" + route.downstreamPort
-      : "http://" + route.downstreamHost + ":" + route.downstreamPort;
+      ? 'https://' + route.downstreamHost + ':' + route.downstreamPort
+      : 'http://' + route.downstreamHost + ':' + route.downstreamPort
 
     lazyPromises.push(
-      (): Promise<axios.AxiosResponse> => {
-        if (method === "post" || method === "put" || method === "patch") {
-          delete req.headers.host;
+      (): Promise<AxiosResponse> => {
+        if (method === 'post' || method === 'put' || method === 'patch') {
+          delete req.headers.host
 
-          return axios.default[method](URL, {
+          return axios[method](URL, {
             data: req.body,
             headers: req.headers,
-            params: req.params
-          });
+            params: req.params,
+          })
         } else {
-          delete req.headers.host;
+          delete req.headers.host
 
-          return axios.default[method](URL, {
+          return axios[method](URL, {
             headers: req.headers,
-            params: req.params
-          });
+            params: req.params,
+          })
         }
       }
-    );
-  });
+    )
+  })
 
-  const results = await pAll(lazyPromises, { concurrency: 5 });
+  const results = await pAll(lazyPromises, { concurrency: 5 })
 
   // Is it possible to handle that in a better manner?
-  let i = 0;
+  let i = 0
   for (let prop in resolvedPromisesResults) {
-    resolvedPromisesResults[prop] = results[i].data;
-    i++;
+    resolvedPromisesResults[prop] = results[i].data
+    i++
   }
 
-  return res.status(200).json(resolvedPromisesResults);
-};
+  return res.status(200).json(resolvedPromisesResults)
+}
 
 export default (app: express.Application, config: Configuration, aggregate: Aggregate): void => {
-  aggregate.upstreamMethods.forEach(method => {
-    app[method](aggregate.upstreamPath, handleAggregateRoute(config, aggregate, method));
-  });
-};
+  aggregate.upstreamMethods.forEach((method) => {
+    app[method](aggregate.upstreamPath, handleAggregateRoute(config, aggregate, method))
+  })
+}

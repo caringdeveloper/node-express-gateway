@@ -22,40 +22,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import * as express from "express";
-import { injectable } from "inversify";
-import * as jwt from "jsonwebtoken";
-import IUserInformation from "./IUserInformation";
+import express from 'express'
+import { injectable } from 'inversify'
+import jwt from 'jsonwebtoken'
+import IUserInformation from './IUserInformation'
 
-const { JWT_SECRET_KEY } = process.env;
+const { JWT_SECRET_KEY } = process.env
 
 @injectable()
 export default class UserInformation implements IUserInformation {
-  public async buildUser(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+  public async buildUser(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ): Promise<void> {
     // For now the authentication middleware will only support Bearer JWT Token authentication
-    const authenticationString = req.headers.authorization;
+    const authenticationString = req.headers.authorization
 
-    if (!authenticationString)
-      return next();
+    if (!authenticationString) return next()
 
-    const token = authenticationString.split(" ")[1];
+    const token = authenticationString.split(' ')[1]
 
-    let decodedToken;
+    let decodedToken
     try {
-      decodedToken = jwt.verify(token, JWT_SECRET_KEY);
+      decodedToken = jwt.verify(token, JWT_SECRET_KEY)
     } catch (err) {
-      return next();
+      return next()
     }
 
     // Token is not valid
     if (!decodedToken) return next()
 
-    req["user"] = {
+    req['user'] = {
       id: decodedToken.id,
       scopes: decodedToken.scope,
-      token
-    };
+      token,
+    }
 
-    return next();
+    return next()
   }
 }

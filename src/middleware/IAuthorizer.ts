@@ -22,14 +22,14 @@
     THE SOFTWARE.
 */
 
-import * as express from "express";
+import express from 'express'
 
 export type AuthorizationMiddleware = (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
-) => express.Response | void;
+) => express.Response | void
 
 export default interface IAuthorizer {
-  authorize(scopes: string[]): AuthorizationMiddleware;
+  authorize(scopes: string[]): AuthorizationMiddleware
 }

@@ -22,10 +22,7 @@
     THE SOFTWARE.
 */
 
-import Gateway from "../index";
+import Gateway from '../index'
 
-const gw1 = Gateway();
-const gw2 = Gateway();
-
-gw1.run("./__tests__/fixtures/config.yml");
-gw2.run("./__tests__/fixtures/config_2.yml");
+const gw1 = Gateway()
+gw1.run('./__tests__/fixtures/config.yml')

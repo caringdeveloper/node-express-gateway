@@ -22,25 +22,25 @@
     THE SOFTWARE.
 */
 
-import axios from "axios";
-import * as express from "express";
-import * as pathToRegexp from "path-to-regexp";
-import * as jwt from "jsonwebtoken";
-import { injectable, inject } from "inversify";
+import axios from 'axios'
+import express from 'express'
+import pathToRegexp from 'path-to-regexp'
+import jwt from 'jsonwebtoken'
+import { injectable, inject } from 'inversify'
 
-import IAuthenticator from "./IAuthenticator";
-import IConfigurationProvider from "../IConfigurationProvider";
-import { Configuration } from "../models/Configuration";
+import IAuthenticator from './IAuthenticator'
+import IConfigurationProvider from '../IConfigurationProvider'
+import { Configuration } from '../models/Configuration'
 
-const { JWT_SECRET_KEY } = process.env;
+const { JWT_SECRET_KEY } = process.env
 
 @injectable()
 export default class JwtAuthenticator implements IAuthenticator {
-  @inject("ConfigurationProvider")
-  private configurationProvider: IConfigurationProvider;
+  @inject('ConfigurationProvider')
+  private configurationProvider: IConfigurationProvider
 
   constructor() {
-    this.authenticate = this.authenticate.bind(this);
+    this.authenticate = this.authenticate.bind(this)
   }
 
   public async authenticate(
@@ -48,62 +48,62 @@ export default class JwtAuthenticator implements IAuthenticator {
     res: express.Response,
     next: express.NextFunction
   ): Promise<express.Response | void> {
-    const config = this.configurationProvider.getConfiguration();
+    const config = this.configurationProvider.getConfiguration()
 
     // For now the authentication middleware will only support Bearer JWT Token authentication
-    const authenticationString = req.headers.authorization;
+    const authenticationString = req.headers.authorization
     if (!authenticationString)
-      return res.status(400).json({ reason: "No authentication header found" });
+      return res.status(400).json({ reason: 'No authentication header found' })
 
-    const token = authenticationString.split(" ")[1];
+    const token = authenticationString.split(' ')[1]
 
-    let decodedToken;
+    let decodedToken
     try {
-      decodedToken = jwt.verify(token, JWT_SECRET_KEY);
+      decodedToken = jwt.verify(token, JWT_SECRET_KEY)
     } catch (err) {
-      return res.status(400).json({ reason: "Token is malformed" });
+      return res.status(400).json({ reason: 'Token is malformed' })
     }
 
     // Token is not valid
-    if (!decodedToken) return res.status(400).json({ reason: "Not a valid token" });
+    if (!decodedToken) return res.status(400).json({ reason: 'Not a valid token' })
 
     // Check if app override
-    if (decodedToken.scope === "app") {
-      req["user"] = {
+    if (decodedToken.scope === 'app') {
+      req['user'] = {
         id: decodedToken.id,
         scopes: decodedToken.scope,
-        token
-      };
+        token,
+      }
 
-      return next();
+      return next()
     }
 
     // Check if token is still valid
     try {
-      const toPath = pathToRegexp.compile(config.authentication.path);
+      const toPath = pathToRegexp.compile(config.authentication.path)
       const compiledPath = toPath({
         userId: decodedToken.id,
-        token
-      });
+        token,
+      })
 
       await axios.get(
         `http://${config.authentication.host}:${config.authentication.port}${compiledPath}`
-      );
+      )
 
-      req["user"] = {
+      req['user'] = {
         id: decodedToken.id,
         scopes: decodedToken.scope,
-        token
-      };
+        token,
+      }
 
-      return next();
+      return next()
     } catch (err) {
       if (err.response && err.response.status) {
         if (err.response.status === 403) {
-          return res.status(403).json({ reason: "The account is banned" });
+          return res.status(403).json({ reason: 'The account is banned' })
         }
       } else {
-        return res.status(400).json({ reason: "Token seems not to be valid" });
+        return res.status(400).json({ reason: 'Token seems not to be valid' })
       }
     }
   }

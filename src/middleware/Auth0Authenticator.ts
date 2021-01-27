@@ -21,29 +21,27 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
 */
-
-import fs from 'fs'
-import yaml from 'yaml'
-import { promisify } from 'util'
-import IConfigurationProvider from './IConfigurationProvider'
-import { Configuration } from './models/Configuration'
+import jwt from 'express-jwt'
 import { injectable } from 'inversify'
+import jwks from 'jwks-rsa'
 
-const readFileAsync = promisify(fs.readFile)
+import IAuthenticator from './IAuthenticator'
+
+const auth0Authenticator = jwt({
+  secret: jwks.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: process.env.AUTH0_JWKS,
+  }),
+  audience: JSON.parse(process.env.AUTH0_AUDIENCE),
+  issuer: process.env.AUTH0_ISSUER,
+  algorithms: ['RS256'],
+})
 
 @injectable()
-export default class ConfigurationProvider implements IConfigurationProvider {
-  private parsedConfiguration: Configuration = undefined
-
-  public async readConfiguration(configurationFilePath: string): Promise<void> {
-    if (!this.parsedConfiguration) {
-      const configurationFileContent = (await readFileAsync(configurationFilePath)).toString('utf8')
-
-      this.parsedConfiguration = yaml.parse(configurationFileContent) as Configuration
-    }
-  }
-
-  public getConfiguration(): Configuration {
-    return this.parsedConfiguration
+export class Auth0Authenticator implements IAuthenticator {
+  async authenticate(req: any, res: any, next: any): Promise<any> {
+    return auth0Authenticator(req, res, next)
   }
 }

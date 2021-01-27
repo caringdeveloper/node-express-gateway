@@ -22,12 +22,8 @@
     THE SOFTWARE.
 */
 
-import * as express from "express";
+import express from 'express'
 
 export default interface IUserInformation {
-  buildUser(
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ): Promise<void>;
+  buildUser(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void>
 }

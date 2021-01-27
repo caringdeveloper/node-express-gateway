@@ -22,12 +22,12 @@
     THE SOFTWARE.
 */
 
-import * as express from "express";
+import express from 'express'
 
 export default interface IAuthenticator {
   authenticate(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
-  ): Promise<express.Response | void>;
+  ): Promise<express.Response | void>
 }

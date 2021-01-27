@@ -22,9 +22,9 @@
     THE SOFTWARE.
 */
 
-import { Configuration } from "./models/Configuration";
+import { Configuration } from './models/Configuration'
 
 export default interface IConfigurationProvider {
-  readConfiguration(configurationFilePath: string): Promise<void>;
-  getConfiguration(): Configuration;
+  readConfiguration(configurationFilePath: string): Promise<void>
+  getConfiguration(): Configuration
 }

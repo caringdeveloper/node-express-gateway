@@ -22,18 +22,18 @@
     THE SOFTWARE.
 */
 
-import * as express from "express";
-import IAuthorizer, { AuthorizationMiddleware } from "./IAuthorizer";
-import { injectable } from "inversify";
+import express from 'express'
+import IAuthorizer, { AuthorizationMiddleware } from './IAuthorizer'
+import { injectable } from 'inversify'
 
 @injectable()
 export default class ScopeAuthorizer implements IAuthorizer {
   authorize(scopes: string[]): AuthorizationMiddleware {
     return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      if (!scopes.includes(req["user"].scopes))
-        return res.status(401).json({ reason: "Not authorized" });
+      if (!scopes.includes(req['user'].scopes))
+        return res.status(401).json({ reason: 'Not authorized' })
 
-      return next();
-    };
+      return next()
+    }
   }
 }

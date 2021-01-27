@@ -22,14 +22,12 @@
     THE SOFTWARE.
 */
 
-import "reflect-metadata";
-import * as dotenv from "dotenv";
+import 'reflect-metadata'
+require('dotenv').config()
 
-import diContainer from "./src/DiContainer";
-import Library from "./Library";
+import diContainer from './src/DiContainer'
+import Library from './Library'
 
-dotenv.config();
-
-export default function(): Library {
-  return diContainer.get<Library>("Library");
+export default function (): Library {
+  return diContainer.get<Library>('Library')
 }

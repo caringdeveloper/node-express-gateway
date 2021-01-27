@@ -22,11 +22,11 @@
     THE SOFTWARE.
 */
 
-import { Application } from "express";
-import { Route } from "./models/Configuration";
+import { Application } from 'express'
+import { Route } from './models/Configuration'
 
 export default interface IRouteGenerator {
   injectAppInstance(app: Application)
-  createProxyRoute(route: Route): void;
-  createAggregateRoute(route: Route): void;
+  createProxyRoute(route: Route): void
+  createAggregateRoute(route: Route): void
 }

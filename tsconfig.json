@@ -8,8 +8,9 @@
     "sourceMap": true,
     "lib": ["es2017"],
     "target": "es2017",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "esModuleInterop": true
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "__tests__/index.ts"],
   "exclude": ["node_modules", "**/*.test.ts", "lib"]
 }

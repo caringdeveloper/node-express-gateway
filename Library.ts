@@ -22,38 +22,38 @@
     THE SOFTWARE.
 */
 
-import * as cors from "cors";
-import * as bodyParser from "body-parser";
-import { injectable, inject } from "inversify";
-import { Application } from "express";
+import cors from 'cors'
+import bodyParser from 'body-parser'
+import { injectable, inject } from 'inversify'
+import { Application } from 'express'
 
-import IConfigurationProvider from "./src/IConfigurationProvider";
-import IRouteGenerator from "./src/IRouteGenerator";
+import IConfigurationProvider from './src/IConfigurationProvider'
+import IRouteGenerator from './src/IRouteGenerator'
 
 @injectable()
 export default class Library {
-  @inject("App")
-  private app: Application;
+  @inject('App')
+  private app: Application
 
-  @inject("ConfigurationProvider")
-  private configurationProvider: IConfigurationProvider;
+  @inject('ConfigurationProvider')
+  private configurationProvider: IConfigurationProvider
 
-  @inject("RouteGenerator")
-  private routeGenerator: IRouteGenerator;
+  @inject('RouteGenerator')
+  private routeGenerator: IRouteGenerator
 
   public async run(configFilePath: string): Promise<void> {
-    await this.configurationProvider.readConfiguration(configFilePath);
-    const config = this.configurationProvider.getConfiguration();
+    await this.configurationProvider.readConfiguration(configFilePath)
+    const config = this.configurationProvider.getConfiguration()
 
-    this.app.enable("trust proxy");
-    this.app.use(cors());
-    this.app.use(bodyParser.json({ limit: "50MB" }));
+    this.app.enable('trust proxy')
+    this.app.use(cors())
+    this.app.use(bodyParser.json())
 
-    this.routeGenerator.injectAppInstance(this.app);
+    this.routeGenerator.injectAppInstance(this.app)
     if (config.routes) {
-      config.routes.forEach(route => this.routeGenerator.createProxyRoute(route));
+      config.routes.forEach((route) => this.routeGenerator.createProxyRoute(route))
     }
 
-    this.app.listen(config.port, () => console.log("[INFO]", "Gateway is listening"));
+    this.app.listen(config.port, () => console.log('[INFO]', 'Gateway is listening'))
   }
 }
