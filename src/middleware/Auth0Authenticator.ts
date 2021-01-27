@@ -22,26 +22,32 @@
     THE SOFTWARE.
 */
 import jwt from 'express-jwt'
-import { injectable } from 'inversify'
+import { inject, injectable } from 'inversify'
 import jwks from 'jwks-rsa'
+import IConfigurationProvider from '../IConfigurationProvider'
 
 import IAuthenticator from './IAuthenticator'
 
-const auth0Authenticator = jwt({
-  secret: jwks.expressJwtSecret({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: process.env.AUTH0_JWKS,
-  }),
-  audience: JSON.parse(process.env.AUTH0_AUDIENCE),
-  issuer: process.env.AUTH0_ISSUER,
-  algorithms: ['RS256'],
-})
-
 @injectable()
 export class Auth0Authenticator implements IAuthenticator {
+  constructor(
+    @inject('ConfigurationProvider') private _configurationProvicer: IConfigurationProvider
+  ) {}
+
   async authenticate(req: any, res: any, next: any): Promise<any> {
+    const config = this._configurationProvicer.getConfiguration()
+    const auth0Authenticator = jwt({
+      secret: jwks.expressJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: config.auth0?.jwks ?? '',
+      }),
+      audience: config.auth0?.audiences ?? [],
+      issuer: config.auth0?.issuer ?? '',
+      algorithms: ['RS256'],
+    })
+
     return auth0Authenticator(req, res, next)
   }
 }

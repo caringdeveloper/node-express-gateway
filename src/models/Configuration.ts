@@ -26,7 +26,8 @@ import { Request } from 'express'
 
 export type Configuration = {
   port: number
-  authentication: Authentication
+  authentication?: Authentication
+  auth0?: Auth0
   routes: Route[]
   aggregates: Aggregate[]
 }
@@ -35,6 +36,12 @@ export type Authentication = {
   host: string
   port: number
   path: string
+}
+
+export type Auth0 = {
+  jwks: string
+  audiences: string[]
+  issuer: string
 }
 
 export enum AuthType {
